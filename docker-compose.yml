@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  stable-diffusion:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: stable-diffusion:0.1.0
+    container_name: stable-diffusion
+    hostname: stable-diffusion
+    user: root
+    volumes:
+      - type: bind
+        source: ./
+        target: /home/docker/stable-diffusion
+    working_dir: /home/docker/stable-diffusion
+    shm_size: '64gb'
+    ports:
+      - "9999:8888"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              device_ids: [GPU-a0c661bc-4d78-0c01-64b8-42de2e9042cb]
+              # gpu3 3090,
+    command: bash -ci "
+      conda activate ldm && jupyter lab --ip=0.0.0.0 --port=8888 --NotebookApp.token='StableDiffusion' --no-browser --allow-root
+      "
